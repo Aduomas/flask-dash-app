@@ -2,9 +2,7 @@ import httpx
 from lxml import html
 import pandas as pd
 from config import Config
-from sqlalchemy import create_engine, insert, select, bindparam, text
-from datetime import datetime
-from app.models import Product, Store
+from sqlalchemy import create_engine, text
 
 engine = create_engine(Config.SQLALCHEMY_DATABASE_URI, client_encoding="utf8")
 
@@ -22,7 +20,7 @@ class Crawler:
         pass
 
     def save(self, df):
-        with engine.connect() as conn:
+        with engine.begin() as conn:
 
             sql_list = [f"('{eshop}')" for eshop in df.eshop.unique()]
             sql_str = ",".join(sql_list)
@@ -72,18 +70,25 @@ class Crawler:
                 )
             )
 
-            scalar_subq_pid = (
-                select(Product.__table__.c.id)
-                .where(Product.__table__.c.name == bindparam("name"))
-                .scalar_subquery()
-            )
-
+            sql_list = [
+                f"""((SELECT id FROM product WHERE name='{title.replace("'", "''")}'), {price}, now())"""
+                for title, manufacturer, eshop, url, price in list(
+                    df.itertuples(index=False, name=None)
+                )
+            ]
+            sql_str = ",".join(sql_list)
             conn.execute(
-                insert(Store.__table__).values(product_id=scalar_subq_pid),
-                [
-                    {"name": row["title"], "price": row.price, "date": datetime.now()}
-                    for index, row in df.iterrows()
-                ],
+                text(
+                    f"""
+                WITH inputvalues(id, price, date) AS (
+                    VALUES {sql_str}
+                )
+                INSERT INTO store (product_id, price, date)
+                SELECT d.id, d.price, d.date
+                FROM inputvalues as d
+                WHERE d.id IS NOT NULL;
+                """
+                )
             )
 
 
@@ -155,8 +160,11 @@ class CrawlerEurovaistine(Crawler):
                             ),
                         ]
                     )
+                preprocessed_len = len(df)
+                df = df.drop_duplicates().reset_index(drop=True)
+                afterprocessed_len = len(df)
                 page += 1
-                if len(elements) < 48:
+                if len(elements) < 48 or (preprocessed_len != afterprocessed_len):
                     break
         return df
 
@@ -220,6 +228,7 @@ class CrawlerBenu(Crawler):
                         ),
                     ]
                 )
+                df = df.drop_duplicates().reset_index(drop=True)
         return df
 
 
@@ -275,10 +284,15 @@ class CrawlerHerba(Crawler):
                     ]
                 )
 
+                preprocessed_len = len(df)
+                df = df.drop_duplicates().reset_index(drop=True)
+                afterprocessed_len = len(df)
+
                 page += 1
 
-                if len(prices) < 24:
+                if len(prices) < 24 or (preprocessed_len != afterprocessed_len):
                     break
+
         return df
 
 

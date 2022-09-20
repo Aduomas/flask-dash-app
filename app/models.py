@@ -6,6 +6,9 @@ from sqlalchemy.sql import func
 from app.extensions import db
 from app.extensions import login
 
+from sqlalchemy import or_
+from sqlalchemy.orm import foreign, remote
+
 
 @login.user_loader
 def load_user(id):
@@ -37,6 +40,21 @@ class Product(db.Model):
     eshop_id = db.Column(db.Integer, db.ForeignKey("eshop.id"), nullable=False)
     store = db.relationship("Store", backref="product")
 
+    # analogs1 = db.relationship(
+    #     "Analog", backref="analog1", foreign_keys="analog.product_id_1"
+    # )
+    # analogs2 = db.relationship(
+    #     "Analog", backref="analog2", foreign_keys="analog.product_id_2"
+    # )
+    analogs = db.relationship(
+        "Analog",
+        primaryjoin=lambda: or_(
+            Analog.id == foreign(remote(Analog.product_id_1)),
+            Analog.id == foreign(remote(Analog.product_id_2)),
+        ),
+        viewonly=True,
+    )
+
     def __repr__(self):
         return "<Product {}>".format(self.name)
 
@@ -65,3 +83,15 @@ class Store(db.Model):
         db.Float, primary_key=True, nullable=False
     )  # primary_key just to not raise errors...
     date = db.Column(db.DateTime(timezone=True), nullable=False, default=func.now())
+
+
+class Analog(db.Model):
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+    product_id_1 = db.Column(db.Integer, db.ForeignKey("product.id"))
+    product_id_2 = db.Column(db.Integer, db.ForeignKey("product.id"))
+
+    product_1 = db.relationship("Product", foreign_keys=product_id_1)
+    product_2 = db.relationship("Product", foreign_keys=product_id_2)

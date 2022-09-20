@@ -22,7 +22,6 @@ controls = dbc.Card(
     [
         dbc.Col(
             [
-                dcc.Store(id="running-update"),
                 dbc.Label("Eshops"),
                 dcc.Dropdown(
                     options=[
@@ -83,7 +82,7 @@ app_layout = dbc.Container(
                 ),
                 dbc.Col(
                     [
-                        html.Button(
+                        dbc.Button(
                             id="update-button",
                             children="Update",
                             style={
@@ -98,7 +97,7 @@ app_layout = dbc.Container(
             ],
             justify="center",
         ),
-        html.P(id="placeholder"),
+        html.P(id="placeholder3"),
         html.Hr(),
         dbc.Row(
             [
@@ -112,7 +111,7 @@ app_layout = dbc.Container(
 )
 
 
-def make_graph_1(manufacturers, eshops):
+def make_graph_1(manufacturers, eshops, value):
     with engine.connect() as conn:
         df = pd.read_sql_query(
             f"""
@@ -185,16 +184,15 @@ def update_data(n_clicks):
 def init_callbacks(dash_app):
     dash_app.callback(
         Output("price-index-graph", "figure"),
-        [
-            Input("checklist-1", "value"),
-            Input("dropdown-1", "value"),
-        ],
+        Input("checklist-1", "value"),
+        Input("dropdown-1", "value"),
+        Input("placeholder3", "value"),
     )(make_graph_1)
 
     dash_app.long_callback(
         inputs=Input("update-button", "n_clicks"),
         running=[(Output("update-button", "disabled"), True, False)],
-        output=Output("placeholder", "value"),
+        output=Output("placeholder3", "value"),
         prevent_initial_call=True,
     )(update_data)
 
