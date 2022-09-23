@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, text
 
 engine = create_engine(Config.SQLALCHEMY_DATABASE_URI, client_encoding="utf8")
 
-
+# Abstract Class for Crawlers
 class Crawler:
     def __init__(self):
         pass
