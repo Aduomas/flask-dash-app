@@ -8,7 +8,11 @@ routes = Blueprint("routes", __name__)
 @routes.route("/")
 @login_required
 def index():
-    return render_template("index.html", content="This is my app!", user=current_user)
+    return render_template(
+        "index.html",
+        content="You are logged in! You can access the following pages:",
+        user=current_user,
+    )
 
 
 @routes.route("/update-data")

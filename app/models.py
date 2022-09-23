@@ -40,12 +40,6 @@ class Product(db.Model):
     eshop_id = db.Column(db.Integer, db.ForeignKey("eshop.id"), nullable=False)
     store = db.relationship("Store", backref="product")
 
-    # analogs1 = db.relationship(
-    #     "Analog", backref="analog1", foreign_keys="analog.product_id_1"
-    # )
-    # analogs2 = db.relationship(
-    #     "Analog", backref="analog2", foreign_keys="analog.product_id_2"
-    # )
     analogs = db.relationship(
         "Analog",
         primaryjoin=lambda: or_(

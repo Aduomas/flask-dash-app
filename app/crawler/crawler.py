@@ -13,6 +13,7 @@ class Crawler:
 
     def get_link(self, url):
         r = httpx.get(url)
+        r.raise_for_status()  # raise an error if status_code != 200
         content = html.fromstring(r.content)
         return content
 
@@ -113,7 +114,15 @@ class CrawlerEurovaistine(Crawler):
             while True:
                 url = f"https://www.eurovaistine.lt/paieska/rezultatai?q={manufacturer}&page={page}"
                 print(f"Getting url: {url}")
-                content = super().get_link(url)
+
+                try:
+                    content = super().get_link(url)
+                except httpx.HTTPError as exc:
+                    print(f"Error while requesting {exc.request.url!r}.")
+                    if page < 10:
+                        continue
+                    else:
+                        break
 
                 elements = content.xpath('//div[@class="product-card"]')
 
@@ -241,8 +250,16 @@ class CrawlerHerba(Crawler):
             while True:
                 url = f"https://www.herba.lt/catalogsearch/result/index/?p={page}&q={manufacturer}"
                 print(f"Getting url: {url}")
-                r = httpx.get(url)
-                content = html.fromstring(r.content)
+
+                try:
+                    content = super().get_link(url)
+                except httpx.HTTPError as exc:
+                    print(f"Error while requesting {exc.request.url!r}.")
+                    if page < 10:
+                        continue
+                    else:
+                        break
+
                 elements = content.xpath('//div[@class="item-inner"]')
 
                 titles = content.xpath('//h4[@class="product-name"]/a/text()')
@@ -298,11 +315,3 @@ class CrawlerHerba(Crawler):
 
 class CrawlerGintarine(Crawler):
     pass
-
-
-if __name__ == "__main__":
-    eurovaistine_crawler = CrawlerEurovaistine()
-    temp_df = eurovaistine_crawler.crawl()
-    # print(temp_df.head())
-    # print(list(temp_df.itertuples(index=False, name=None)))
-    eurovaistine_crawler.save(temp_df)

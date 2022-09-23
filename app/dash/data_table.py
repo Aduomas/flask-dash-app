@@ -1,10 +1,8 @@
 import dash_bootstrap_components as dbc
 from dash import dcc
 from dash import html
-import dash
 import pandas as pd
 import numpy as np
-import plotly.graph_objs as go
 import plotly.express as px
 from dash.dependencies import Input, Output
 from .dash import Dash
@@ -95,25 +93,6 @@ controls = dbc.Container(
 
 app_layout = dbc.Container(
     [
-        # dbc.Row(
-        #     [
-        #         dbc.Col(
-        #             [
-        #                 html.H1("Analog Price Index", style={"textAlign": "center"}),
-        #             ],
-        #             md=12,
-        #         )
-        #     ],
-        #     justify="center",
-        # ),
-        # html.Hr(),
-        # dbc.Row(
-        #     [
-        #         dbc.Col(controls, md=3),
-        #         dbc.Col(dcc.Graph(id="analog-index-graph"), md=8),
-        #     ],
-        #     align="center",
-        # ),
         html.Hr(),
         html.H2("Data Table", style={"textAlign": "center"}),
         html.Hr(),
