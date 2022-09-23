@@ -54,9 +54,9 @@ def _protect_dashviews(dashapp):
     for view_func in dashapp.view_functions:
         if view_func.startswith(
             (
-                "/price_index/",
+                "/price-index/",
                 "/analogs/",
-                "/data_table/",
+                "/data-table/",
             )
         ):
             dashapp.view_functions[view_func] = login_required(
