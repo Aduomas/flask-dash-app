@@ -299,7 +299,7 @@ def init_callbacks(dash_app):
         Input("checklist-2", "value"),
         Input("dropdown-2", "value"),
         Input("placeholder4", "value"),
-    )(make_graph_1)
+    )(make_graph_2)
 
     dash_app.long_callback(
         inputs=Input("update-button", "n_clicks"),
