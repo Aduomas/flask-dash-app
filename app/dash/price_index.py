@@ -241,7 +241,7 @@ def make_graph_2(manufacturers, eshops, value):
             xaxis=dict(color="#003f5c"),
             xaxis_title="Date",
             yaxis_title="Price (€)",
-            legend_title="Manufacturer",
+            legend_title="Eshop",
             font=dict(size=14, color="#7a5195"),
         )
         fig.update_traces(line=dict(width=3))
