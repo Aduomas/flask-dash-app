@@ -18,11 +18,12 @@ def get_products():
     with engine.connect() as conn:
         df = pd.read_sql_query(
             f"""
-            SELECT DISTINCT ON (date) product.name, product.url, manufacturer.name AS manufacturer, eshop.name AS eshop, price 
+            SELECT DISTINCT ON (date) product.name, product.url, manufacturer.name AS manufacturer, eshop.name AS eshop, store.price 
             FROM product
             INNER JOIN manufacturer ON product.manufacturer_id = manufacturer.id
             INNER JOIN eshop ON product.eshop_id = eshop.id
-            INNER JOIN store ON store.product_id = product.id
+            LEFT JOIN store ON product.id = store.product_id
+            ORDER BY date DESC
             """,
             conn,
         )
