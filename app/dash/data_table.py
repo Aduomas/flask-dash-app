@@ -1,6 +1,6 @@
 import dash_bootstrap_components as dbc
 from dash import dcc
-from dash import html
+from dash import html, dash_table
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -14,133 +14,81 @@ from sqlalchemy import create_engine
 engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
 
 
-def bubble_sort(data, column, ascending):
-    n = len(data)
-    swapped = False
-    for i in range(n - 1):
-
-        for j in range(n - i - 1):
-
-            if ascending:
-                if data.loc[j, column] > data.loc[j + 1, column]:
-                    swapped = True
-
-                    data.loc[j, :], data.loc[j + 1, :] = (
-                        data.loc[j + 1, :],
-                        data.loc[j, :],
-                    )
-            else:
-                if data.loc[j, column] < data.loc[j + 1, column]:
-                    swapped = True
-                    data.loc[j, :], data.loc[j + 1, :] = (
-                        data.loc[j + 1, :],
-                        data.loc[j, :],
-                    )
-
-        if not swapped:
-            return
-
-
-def update_data_table(sort_by_value, sort_order):
-
-    sort_map = {
-        "Relative Difference": "percentage_diff",
-        "Absolute Difference": "absolute_diff",
-        "Price of Product 1": "price1",
-        "Price of Product 2": "price2",
-        "": "percentage_diff",
-    }
-
+def get_products():
     with engine.connect() as conn:
         df = pd.read_sql_query(
             f"""
-            SELECT DISTINCT ON (s1.date) p1.name AS product_1, s1.price AS price1, p2.name AS product_2, s2.price AS price2, (s1.price / s2.price) AS percentage_diff, (s1.price - s2.price) AS absolute_diff
-            FROM analog
-            INNER JOIN product AS p1 ON p1.id = analog.product_id_1
-            INNER JOIN product AS p2 ON p2.id = analog.product_id_2
-            INNER JOIN store AS s1 ON s1.product_id = analog.product_id_1
-            INNER JOIN store AS s2 ON s2.product_id = analog.product_id_2
-            ORDER BY s1.date DESC
+            SELECT DISTINCT ON (date) product.name, product.url, manufacturer.name AS manufacturer, eshop.name AS eshop, price 
+            FROM product
+            INNER JOIN manufacturer ON product.manufacturer_id = manufacturer.id
+            INNER JOIN eshop ON product.eshop_id = eshop.id
+            INNER JOIN store ON store.product_id = product.id
             """,
             conn,
         )
-        df["percentage_diff"] = np.round((df["percentage_diff"] - 1) * 100, decimals=2)
-        df["percentage_diff"] = df["percentage_diff"].astype(str) + "%"
-        df["absolute_diff"] = np.round(df["absolute_diff"], decimals=2)
-        # return dbc.Table.from_dataframe(
-        #     df.sort_values(
-        #         sort_map[sort_by_value],
-        #         ascending=True if sort_order == "Ascending" else False,
-        #     ),
-        #     striped=True,
-        #     bordered=True,
-        #     hover=True,
-        # )
-        bubble_sort(
-            df, sort_map[sort_by_value], True if sort_order == "Ascending" else False
-        )
-        return dbc.Table.from_dataframe(
-            df,
-            striped=True,
-            bordered=True,
-            hover=True,
-        )
+        df = df.drop("manufacturer", axis=1)
+        df.columns = ["Product Name", "URL", "Eshop", "Last Price"]
+        df = df[["Product Name", "Eshop", "Last Price", "URL"]]
+        return df
+
+
+product_names = get_products()
 
 
 controls = dbc.Container(
     [],
 )
 
+
+table = dash_table.DataTable(
+    id="analog-data",
+    data=product_names.to_dict("records"),
+    columns=[{"name": i, "id": i} for i in product_names.columns],
+    style_data={
+        "color": "black",
+        "backgroundColor": "white",
+    },
+    style_table={"height": 800},
+    style_data_conditional=[
+        {
+            "if": {"row_index": "odd"},
+            "backgroundColor": "rgb(220, 220, 220)",
+        }
+    ],
+    style_header={
+        "backgroundColor": "rgb(210, 210, 210)",
+        "color": "black",
+        "fontWeight": "bold",
+    },
+    style_cell_conditional=[
+        {"if": {"column_id": c}, "textAlign": "left"} for c in product_names.columns
+    ],
+    css=[
+        {
+            "selector": ".Select-menu-outer",
+            "rule": "display: block !important",
+        }
+    ],
+    page_size=20,
+    filter_action="native",
+    sort_action="native",
+)
+
 app_layout = dbc.Container(
     [
         html.Hr(),
-        html.H2("Data Table", style={"textAlign": "center"}),
+        html.H2("Product Search", style={"textAlign": "center"}),
         html.Hr(),
-        dbc.Row(
+        dbc.Card(
             [
-                dbc.Col(
+                dbc.Row(
                     [
-                        html.H5(
-                            "Sort By",
-                            style={"textAlign": "center"},
-                        ),
-                        html.Hr(),
-                        dcc.Dropdown(
-                            options=[
-                                "Relative Difference",
-                                "Absolute Difference",
-                                "Price of Product 1",
-                                "Price of Product 2",
-                            ],
-                            value="Relative Difference",
-                            id="dropdown-sort-1",
-                            style={"color": "black"},
-                        ),
-                        dcc.Dropdown(
-                            options=["Ascending", "Descending"],
-                            value="Descending",
-                            id="dropdown-sort-2",
-                            style={"color": "black"},
+                        dbc.Col(
+                            [table],
+                            md=10,
                         ),
                     ],
-                    md=2,
-                ),
-                dbc.Col(
-                    [
-                        html.Div(
-                            id="analog-data-table-2",
-                            style={
-                                "width": "80%",
-                                "margin": "0 auto",
-                                "maxHeight": "400px",
-                                "overflow": "scroll",
-                            },
-                            children=update_data_table(
-                                "Relative Difference", "Descending"
-                            ),
-                        ),
-                    ],
-                    md=10,
+                    justify="center",
                 ),
             ]
         ),
@@ -196,11 +144,6 @@ def make_graph_1(manufacturers, eshops, value):
 
 
 def init_callbacks(dash_app):
-    dash_app.callback(
-        Output("analog-data-table-2", "children"),
-        Input("dropdown-sort-1", "value"),
-        Input("dropdown-sort-2", "value"),
-    )(update_data_table)
 
     # dash_app.callback()()
 

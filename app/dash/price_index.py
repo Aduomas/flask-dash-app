@@ -21,47 +21,21 @@ controls = dbc.Card(
     [
         dbc.Col(
             [
-                dbc.Label("Eshops"),
-                dcc.Dropdown(
+                dbc.Label("Manufacturer Selection", color="#40587e"),
+                dbc.Checklist(
                     options=[
-                        "Herba",
-                        "Eurovaistine",
-                        "Benu",
-                        "Gintarine",
-                    ],
-                    value=[
-                        "Herba",
-                        "Eurovaistine",
-                        "Benu",
-                        "Gintarine",
-                    ],
-                    multi=True,
-                    id="dropdown-1",
-                    style={"color": "black"},
-                ),
-                dbc.Label("Manufacturers"),
-                dcc.Dropdown(
-                    options=[
-                        "Uriage",
-                        "Bioderma",
-                        "Filorga",
-                        "Vichy",
-                        "La Roche-Posay",
-                        "Svr",
-                        "Apivita",
-                    ],
-                    value=[
-                        "Uriage",
-                        "Bioderma",
-                        "Filorga",
-                        "Vichy",
-                        "La Roche-Posay",
-                        "Svr",
-                        "Apivita",
+                        {"label": item, "value": item}
+                        for item in [
+                            "Uriage",
+                            "Bioderma",
+                            "Filorga",
+                            "Vichy",
+                            "La Roche-Posay",
+                            "Svr",
+                            "Apivita",
+                        ]
                     ],
                     id="checklist-1",
-                    multi=True,
-                    style={"color": "black"},
                 ),
             ]
         ),
@@ -69,57 +43,74 @@ controls = dbc.Card(
     body=True,
 )
 
+
+graph_1 = dbc.Col(
+    [
+        html.Div(
+            children=[
+                dbc.Select(
+                    placeholder="Select an E-shop",
+                    options=[
+                        {"label": item, "value": item}
+                        for item in ["Herba", "Eurovaistine", "Benu", "Gintarine"]
+                    ],
+                    id="dropdown-1",
+                    class_name="mb-2 col-lg-2 offset-lg-4",
+                )
+            ],
+            className="mx-auto",
+        ),
+        dcc.Graph(id="price-index-graph"),
+    ]
+)
+
+graph_2 = dbc.Col(
+    [
+        html.Div(
+            children=[
+                dbc.Select(
+                    placeholder="Select an Manufacturer",
+                    options=[
+                        {"label": item, "value": item}
+                        for item in [
+                            "Uriage",
+                            "Bioderma",
+                            "Filorga",
+                            "Vichy",
+                            "La Roche-Posay",
+                            "Svr",
+                            "Apivita",
+                        ]
+                    ],
+                    id="dropdown-2",
+                    class_name="mb-2 col-lg-2 offset-lg-4",
+                )
+            ],
+            className="mx-auto",
+        ),
+        dcc.Graph(id="price-index-graph-2"),
+    ]
+)
+
+
 controls2 = dbc.Card(
     [
         dbc.Col(
             [
-                dbc.Label("Eshops"),
-                dcc.Dropdown(
+                dbc.Label("Eshop Selection", color="#40587e"),
+                dbc.Checklist(
                     options=[
-                        "Herba",
-                        "Eurovaistine",
-                        "Benu",
-                        "Gintarine",
-                    ],
-                    value=[
-                        "Herba",
-                        "Eurovaistine",
-                        "Benu",
-                        "Gintarine",
-                    ],
-                    multi=True,
-                    id="dropdown-2",
-                    style={"color": "black"},
-                ),
-                dbc.Label("Manufacturers"),
-                dcc.Dropdown(
-                    options=[
-                        "Uriage",
-                        "Bioderma",
-                        "Filorga",
-                        "Vichy",
-                        "La Roche-Posay",
-                        "Svr",
-                        "Apivita",
-                    ],
-                    value=[
-                        "Uriage",
-                        "Bioderma",
-                        "Filorga",
-                        "Vichy",
-                        "La Roche-Posay",
-                        "Svr",
-                        "Apivita",
+                        {"label": item, "value": item}
+                        for item in ["Herba", "Eurovaistine", "Benu", "Gintarine"]
                     ],
                     id="checklist-2",
-                    multi=True,
-                    style={"color": "black"},
                 ),
             ]
         ),
     ],
     body=True,
 )
+
 
 app_layout = dbc.Container(
     [
@@ -127,9 +118,12 @@ app_layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        html.H1("Price Index", style={"textAlign": "center"}),
+                        html.H1(
+                            "Price Comparison in E-commerce",
+                            style={"textAlign": "center"},
+                        ),
                     ],
-                    md=11,
+                    md=10,
                 ),
                 dbc.Col(
                     [
@@ -137,32 +131,63 @@ app_layout = dbc.Container(
                             id="update-button",
                             children="Update",
                             style={
-                                "margin-top": "20px",
-                                "height": "60%",
+                                "margin-top": "5px",
+                                "height": "80%",
                                 "textAlign": "right",
                             },
                         ),
                     ],
-                    md=1,
+                    md=2,
                 ),
             ],
             justify="center",
         ),
         html.P(id="placeholder3"),
         html.Hr(),
+        html.Hr(),
         dbc.Row(
             [
-                dbc.Col(controls, md=3),
-                dbc.Col(dcc.Graph(id="price-index-graph"), md=8),
+                dbc.Col(
+                    [
+                        html.H3(
+                            "Price Comparison based on Eshop",
+                            style={"textAlign": "center", "color": "#40587e"},
+                        ),
+                    ],
+                )
+            ],
+            justify="center",
+        ),
+        html.Hr(),
+        dbc.Row(
+            [
+                dbc.Col(controls, md=2),
+                dbc.Col(graph_1, md=9),
             ],
             align="center",
         ),
         html.P(id="placeholder4"),
         html.Hr(),
+        html.Hr(),
+        html.Hr(),
         dbc.Row(
             [
-                dbc.Col(controls2, md=3),
-                dbc.Col(dcc.Graph(id="price-index-graph-2"), md=8),
+                dbc.Col(
+                    [
+                        html.H3(
+                            "Price Comparison based on Manufacturer",
+                            style={"textAlign": "center", "color": "#40587e"},
+                        ),
+                    ],
+                )
+            ],
+            justify="center",
+        ),
+        html.Hr(),
+        dbc.Row(
+            [
+                dbc.Col(controls2, md=2),
+                dbc.Col(graph_2, md=9),
             ],
             align="center",
         ),
@@ -171,7 +196,10 @@ app_layout = dbc.Container(
 )
 
 
-def make_graph_1(manufacturers, eshops, value):
+def make_graph_1(manufacturers, eshop, value):
+    if not (manufacturers and eshop):
+        return dash.no_update
+
     with engine.connect() as conn:
         df = pd.read_sql_query(
             f"""
@@ -180,7 +208,7 @@ def make_graph_1(manufacturers, eshops, value):
             INNER JOIN product ON store.product_id=product.id
             INNER JOIN manufacturer ON product.manufacturer_id=manufacturer.id
             INNER JOIN eshop ON product.eshop_id=eshop.id
-            WHERE eshop.name IN ({', '.join(f"'{w}'" for w in eshops)})
+            WHERE eshop.name = '{eshop}'
             AND manufacturer.name IN ({', '.join(f"'{w}'" for w in manufacturers)})
             ORDER BY date ASC;
             """,
@@ -216,7 +244,13 @@ def make_graph_1(manufacturers, eshops, value):
         return fig
 
 
-def make_graph_2(manufacturers, eshops, value):
+def make_graph_2(eshops, manufacturer, value):
+    if not (manufacturer and eshops):
+        return dash.no_update
+
+    print(f"{manufacturer=}", flush=True)
+    print(f"{eshops=}", flush=True)
+
     with engine.connect() as conn:
         df = pd.read_sql_query(
             f"""
@@ -226,7 +260,7 @@ def make_graph_2(manufacturers, eshops, value):
             INNER JOIN manufacturer ON product.manufacturer_id=manufacturer.id
             INNER JOIN eshop ON product.eshop_id=eshop.id
             WHERE eshop.name IN ({', '.join(f"'{w}'" for w in eshops)})
-            AND manufacturer.name IN ({', '.join(f"'{w}'" for w in manufacturers)})
+            AND manufacturer.name ='{manufacturer}'
             ORDER BY date ASC;
             """,
             conn,
