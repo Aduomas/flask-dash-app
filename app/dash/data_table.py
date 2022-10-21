@@ -48,6 +48,8 @@ table = dash_table.DataTable(
     style_data={
         "color": "black",
         "backgroundColor": "white",
+        "height": "auto",
+        "whiteSpace": "normal",
     },
     style_table={"height": 800},
     style_data_conditional=[
