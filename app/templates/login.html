@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block styles %}
+  {{ super() }}
+  {{ styles }}
+{% endblock %}
+{% block title %} Login Page {% endblock %}
+{% block content %}
+  <div class="container pb-5">
+    <div class="row justify-content-center">
+      <div class="col-auto col-md-10">
+        <form method="POST">
+            <h3 align="center">Login</h3>
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+            </div>
+            <input type="checkbox" id="remember" name="remember">
+            <label class="checkbox-inline" for="remember" aria-describedby="remember">Remember Me</label>
+            <br />
+            <button type="submit" class="btn btn-primary">Login</button>
+            <br/>
+          </form>
+          <br/>
+            
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-auto col-md-10">
+      <label>Or Sign Up</label>
+      <br/>
+      <a class="btn btn-primary" href="/register">Sign Up</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block styles %}
+  {{ super() }}
+  {{ styles }}
+{% endblock %}
+{% block title %} Home Page {% endblock %}
+{% block content %}
+  <div class="container pb-5">
+    <div class="row justify-content-center">
+      <div class="col-auto col-md-10">
+        {{ content }}
+      </div>
+    </div>
+
+    <div class="row justify-content-center mt-2">
+      <div class="col-auto col-md-10">
+        <a href="price-index" role="button" class="btn btn-primary btn-sm">Price Index Page</a>
+      </div>
+    </div>
+
+    <div class="row justify-content-center mt-2">
+      <div class="col-auto col-md-10">
+        <a href="analogs" role="button" class="btn btn-primary btn-sm">Analogs Page</a>
+      </div>
+    </div>
+
+    <div class="row justify-content-center mt-2">
+      <div class="col-auto col-md-10">
+        <a href="data-table" role="button" class="btn btn-primary btn-sm">Data Table Page</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+{% endblock %}
