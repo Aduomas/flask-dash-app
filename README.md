@@ -2,7 +2,7 @@
 
 Flask-Dash-App is an interactive web application that combines the power of Flask and Plotly's Dash to visualize price differences among various Lithuanian stores, such as Benu, Eurovaistine, Herba, and more. The application allows users to explore and analyze the data in real-time using interactive plots.
 
-![Page Index Image](https://ibb.co/M5CSgqx)
+![Page Index Image](https://imgtr.ee/i/screenshot-2023-04-05-225821.kdTlY)
 
 ## Table of Contents
 
